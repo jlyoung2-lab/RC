@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CFA-Style Reading Comprehension Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .story-content {
+            height: calc(100vh - 200px); /* Adjust height based on header/footer */
+        }
+        .question-container {
+            min-height: 400px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="bg-white shadow-md rounded-lg p-6 mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-4 text-center">Reading Comprehension Assessment</h1>
+            <div class="flex flex-col md:flex-row gap-4">
+                <div class="flex-1">
+                    <label for="studentName" class="block text-sm font-medium text-gray-700">Student Name</label>
+                    <input type="text" id="studentName" name="studentName" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="e.g., Jane Doe">
+                </div>
+                <div class="flex-1">
+                    <label for="classHour" class="block text-sm font-medium text-gray-700">Class Hour</label>
+                    <input type="text" id="classHour" name="classHour" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="e.g., 3rd Hour">
+                </div>
+            </div>
+        </header>
+
+        <main class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Story Column -->
+            <div class="bg-white shadow-md rounded-lg p-6">
+                <h2 class="text-2xl font-semibold mb-4 border-b pb-2">Reading Passages</h2>
+                <div id="storyContainer" class="prose max-w-none overflow-y-auto story-content pr-4">
+                    <div id="passage1">
+                        <h3 class="font-bold text-lg">Passage 1: "The Cardboard Rocket"</h3>
+                        <p id="passage1-text">That was the summer of Apollo 15, and I was going to be an astronaut. Every adult who asked, "What do you want to be when you grow up?" got the same confident answer. But I wasn't just waiting around. My mission started in our garage. For weeks, I collected every scrap of cardboard I could find: appliance boxes from neighbors, flattened cartons from the grocery store, and the big, sturdy sheets my dad brought home from his workshop. My rocket, which I named <i>The Voyager</i>, began to take shape. It had a detailed command module with a plexiglass viewport I’d salvaged from a broken storm door. Inside, I drew dozens of dials, switches, and gauges with a silver marker. There were foil-covered fins, a nose cone that was a masterpiece of geometry and duct tape, and three "thrusters" made from old coffee cans. I spent every sun-drenched afternoon working on it, imagining the roar of the engines and the feeling of leaving Earth behind. My friends would come by and watch, but they didn't get it. For them, it was a box. For me, it was a vessel. The launch was scheduled for the next big thunderstorm. As the sky turned a bruised purple and the wind began to howl, I put on my bicycle helmet, climbed inside <i>The Voyager</i>, and sealed the cardboard hatch. The rain hammered against the sides, sounding just like the shudder of a real launch. The flashes of lightning were cosmic radiation storms. For ten minutes, I was an astronaut, navigating asteroid fields and gazing at distant nebulae drawn on the interior walls. Then, a new sound—a soft, sad sagging. Water was seeping in. The mighty nose cone drooped, and a fin tore away. When the storm passed, I emerged not to a cheering crowd, but to a soggy, collapsed heap of cardboard. I wasn't sad, though. Looking at the wreck, I realized I hadn't really wanted to fly. The greatest thrill, I understood with sudden clarity, had been in the designing and the building.</p>
+                    </div>
+                    <hr class="my-6">
+                    <div id="passage2" class="hidden">
+                         <h3 class="font-bold text-lg">Passage 2: "The Stage Door"</h3>
+                        <p id="passage2-text">My dream wasn't just to be an actress; it was to be a <i>star</i>. I pictured my name in lights, the roar of applause, and interviews about my "process." When I was sixteen, I got my first taste of it—a non-speaking role as "Third Villager from the Left" in a local production of a historical drama. It didn't matter. I was on the inside. I imagined making friends with the lead actors, sharing knowing glances backstage, and being discovered by a famous director who just happened to be in the audience. The reality was far less glamorous. Rehearsals were mostly long periods of waiting around while the director worked with the leads. My costume was itchy, and my big moment on stage consisted of walking across it holding a basket. Backstage was not a place of glamour but of quiet, focused work. I watched the stage manager, headset on, silently cueing lights and sound, her face a mask of concentration. I saw the prop master meticulously arranging items on a table for the next scene, ensuring everything was perfectly placed. My rite of passage came not on stage, but in the wings. During the final performance, I stood in the darkness watching the lead actress, Eleanor, take her final bow. The spotlight hit her, the applause was deafening, and for a moment, I felt a pang of the envy I’d expected. But it was quickly replaced by something else: awe. Not for her, but for the whole illusion. I saw the perfectly timed fade of the lights, the subtle sound of rain from the speakers, the way the "moonlight" from the rafters hit the exact spot on the stage it was supposed to. In that moment, I knew my dream had been pointed in the wrong direction. I didn't want to <i>be</i> the person in the spotlight; I wanted to be one of the people who created it.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Column -->
+            <div id="quizContainer" class="bg-white shadow-md rounded-lg p-6 flex flex-col justify-between question-container">
+                 <!-- Questions will be injected here -->
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const studentNameInput = document.getElementById('studentName');
+        const classHourInput = document.getElementById('classHour');
+        const quizContainer = document.getElementById('quizContainer');
+
+        const quizData = [
+            {
+                testType: 1,
+                passage: 1,
+                question: "What is the central idea of Passage 1?",
+                options: [
+                    { text: "Rain can easily ruin even the most carefully planned projects.", feedback: "While the rain did ruin the rocket, this is a detail, not the main point. Think about what the narrator learned at the very end." },
+                    { text: "The true value of a project can be found in the process of creation, not the final outcome.", feedback: "Correct! The narrator explicitly states, 'The greatest thrill... had been in the designing and the building.' This shows his discovery about the joy of the creative process." },
+                    { text: "Becoming an astronaut requires a lot of imagination and hard work.", feedback: "The narrator certainly shows imagination and hard work, but is this the main lesson of the story? Consider his realization after the rocket is destroyed." },
+                    { text: "Building things with friends is more fun than building them alone.", feedback: "The story mentions that his friends 'didn't get it.' The project was a solo journey of discovery for the narrator." }
+                ],
+                correctAnswer: "The true value of a project can be found in the process of creation, not the final outcome."
+            },
+            {
+                testType: 1,
+                passage: 1,
+                question: "Which sentence best summarizes Passage 1?",
+                options: [
+                    { text: "A boy who wants to be an astronaut successfully launches a rocket he builds in his backyard.", feedback: "The launch wasn't successful in the traditional sense; a storm destroyed the rocket. This choice misses the story's conclusion." },
+                    { text: "A boy is devastated when a storm destroys his summer project and he gives up on his dream.", feedback: "This is close, but the key detail is that he *wasn't* sad or devastated. This reaction is central to the story's theme." },
+                    { text: "A boy collects cardboard and other materials to build a playhouse to share with his friends.", feedback: "This is incorrect. The object was a rocket, a 'vessel' for a solo journey, not a playhouse for friends." },
+                    { text: "A boy dreams of spaceflight and builds a detailed rocket, only to discover his real passion was for designing and building it.", feedback: "Excellent! This summary captures the initial motivation (spaceflight), the action (building the rocket), and the final, important realization." }
+                ],
+                correctAnswer: "A boy dreams of spaceflight and builds a detailed rocket, only to discover his real passion was for designing and building it."
+            },
+            {
+                testType: 1,
+                passage: 1,
+                question: "Why does the narrator most likely schedule the rocket's 'launch' during a thunderstorm?",
+                options: [
+                    { text: "He was trying to hide his project from his friends.", feedback: "The passage mentions his friends watched him build it, so he wasn't trying to hide. Think about what a thunderstorm sounds and looks like." },
+                    { text: "He hoped the lightning would power his rocket.", feedback: "The rocket is made of cardboard and has no electronics. The storm is for effect, not power." },
+                    { text: "To create a dramatic and realistic simulation of a real space launch.", feedback: "Correct! The 'hammering' rain sounded like a real launch, and the lightning flashes were like 'cosmic radiation storms.' The storm added to his imaginative play." },
+                    { text: "He did not plan it; the storm was a surprise.", feedback: "The text says, 'The launch was scheduled for the next big thunderstorm,' which shows it was intentional." }
+                ],
+                correctAnswer: "To create a dramatic and realistic simulation of a real space launch."
+            },
+            {
+                testType: 2,
+                passage: 2,
+                question: "Which sentence best summarizes Passage 2?",
+                options: [
+                    "A girl is disappointed by her small role in a play and decides to quit acting forever.",
+                    "An actress learns that becoming a star requires making friends with the right people backstage.",
+                    "A young actress with dreams of stardom realizes she is more fascinated by the work behind the scenes than by being in the spotlight.",
+                    "A girl works hard in a local play and is chosen to be the lead actress in the next production."
+                ],
+                correctAnswer: "A young actress with dreams of stardom realizes she is more fascinated by the work behind the scenes than by being in the spotlight.",
+                feedback: "The correct answer is C. This choice accurately reflects the narrator's journey from wanting to be a star to appreciating the technical craft of theater production. She doesn't quit acting (A), learn about networking (B), or get a bigger role (D); she discovers a new passion."
+            },
+            {
+                testType: 2,
+                passage: 2,
+                question: "What detail most clearly illustrates the rite of passage in Passage 2?",
+                options: [
+                    "She spent hours waiting backstage for her one brief moment on stage.",
+                    "She dreamed of hearing the audience applaud for her name.",
+                    "She got her first role as 'Third Villager from the Left' in a local play.",
+                    "She watched the lead actress take a bow and realized she wanted to create the magic of the show, not just star in it."
+                ],
+                correctAnswer: "She watched the lead actress take a bow and realized she wanted to create the magic of the show, not just star in it.",
+                feedback: "The correct answer is D. A rite of passage is a moment of transition. While the other options are parts of her experience, this is the specific moment of realization—the 'threshold'—where her perspective and ambitions fundamentally change."
+            },
+            {
+                testType: 2,
+                passage: 2,
+                question: "How does the narrator's idea of what is impressive about theater change by the end of the passage?",
+                options: [
+                    "She is initially impressed by the idea of fame but later by the lead actress's talent.",
+                    "She shifts from being impressed by the glamour of stardom to the technical skill required to create the 'illusion' of the play.",
+                    "She realizes that the costumes and props are more interesting than the acting itself.",
+                    "She decides that being a director is a more powerful role than being an actor."
+                ],
+                correctAnswer: "She shifts from being impressed by the glamour of stardom to the technical skill required to create the 'illusion' of the play.",
+                feedback: "The correct answer is B. Initially, she dreams of her 'name in lights.' By the end, she is in 'awe' of the 'whole illusion,' including the perfectly timed lights and sounds, which represents the technical craft of the production."
+            },
+            {
+                testType: 2,
+                passage: 'Both',
+                question: "Which is the strongest comparative summary of both passages?",
+                options: [
+                    "Both stories are about the disappointment of failure and the difficulty of achieving a childhood dream.",
+                    "Both narrators experience a shift in their ambitions after discovering that the process behind their dream was more fulfilling than the dream itself.",
+                    "Both passages highlight the importance of having a creative hobby as a teenager.",
+                    "Both authors tell stories about how their first job taught them valuable life lessons."
+                ],
+                correctAnswer: "Both narrators experience a shift in their ambitions after discovering that the process behind their dream was more fulfilling than the dream itself.",
+                feedback: "The correct answer is B. This is the strongest comparison. The narrator of Passage 1 discovers joy in the 'designing and building,' not space travel. The narrator of Passage 2 discovers a passion for the 'creation' of theater, not for being the star. Both find a deeper interest in the process."
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let userAnswers = {};
+        
+        function updateVisiblePassage(passage) {
+            const passage1Div = document.getElementById('passage1');
+            const passage2Div = document.getElementById('passage2');
+            const hrSeparator = document.querySelector('#passage1 + hr');
+
+            passage1Div.classList.add('hidden');
+            passage2Div.classList.add('hidden');
+            hrSeparator.classList.add('hidden');
+
+            if (passage === 1) {
+                passage1Div.classList.remove('hidden');
+            } else if (passage === 2) {
+                passage2Div.classList.remove('hidden');
+            } else if (passage === 'Both') {
+                passage1Div.classList.remove('hidden');
+                passage2Div.classList.remove('hidden');
+                hrSeparator.classList.remove('hidden');
+            }
+        }
+
+        function showTransitionScreen() {
+            quizContainer.innerHTML = `
+                <div class="text-center">
+                    <h2 class="text-2xl font-bold mb-4">Test 1 Complete</h2>
+                    <p class="text-gray-700 mb-6">You have completed the first part of the assessment. When you are ready, please proceed to Test 2. This section will not provide immediate feedback on your answers.</p>
+                </div>
+                <button id="startTest2Button" class="w-full p-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Start Test 2
+                </button>
+            `;
+            document.getElementById('startTest2Button').addEventListener('click', displayQuestion);
+        }
+
+        function displayQuestion() {
+            if (currentQuestionIndex >= quizData.length) {
+                showFinalScreen();
+                return;
+            }
+
+            const questionData = quizData[currentQuestionIndex];
+            updateVisiblePassage(questionData.passage);
+            
+            let testTitle = questionData.testType === 1 ? 'Test 1: Practice with Feedback' : 'Test 2: Final Assessment';
+            
+            quizContainer.innerHTML = `
+                <div>
+                    <h2 class="text-xl font-semibold mb-2">${testTitle}</h2>
+                    <p class="text-md text-gray-700 mb-4">${questionData.question}</p>
+                    <div id="optionsContainer" class="space-y-3">
+                        ${questionData.options.map((option, index) => `
+                            <button data-index="${index}" class="w-full text-left p-3 bg-gray-200 rounded-lg hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-colors duration-200">
+                                <span class="font-bold mr-2">${String.fromCharCode(65 + index)}.</span> ${option.text || option}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <div id="feedbackContainer" class="p-4 rounded-lg hidden"></div>
+                    <div class="text-right mt-4">
+                        <span class="text-sm text-gray-500">Question ${currentQuestionIndex + 1} of ${quizData.length}</span>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('optionsContainer').addEventListener('click', (event) => {
+                const button = event.target.closest('button');
+                if (button) {
+                    handleAnswer(parseInt(button.dataset.index));
+                }
+            });
+        }
+        
+        function handleAnswer(selectedIndex) {
+            const questionData = quizData[currentQuestionIndex];
+            const selectedOption = questionData.options[selectedIndex];
+            const selectedAnswerText = selectedOption.text || selectedOption;
+            userAnswers[currentQuestionIndex] = selectedAnswerText;
+
+            if (questionData.testType === 1) {
+                const isCorrect = selectedAnswerText === questionData.correctAnswer;
+                const feedbackContainer = document.getElementById('feedbackContainer');
+                
+                feedbackContainer.textContent = selectedOption.feedback;
+                feedbackContainer.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800');
+
+                if (isCorrect) {
+                    feedbackContainer.classList.add('bg-green-100', 'text-green-800');
+                    document.querySelectorAll('#optionsContainer button').forEach(btn => btn.disabled = true);
+                    feedbackContainer.innerHTML += `<button id="nextButton" class="block w-full mt-4 p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Next Question</button>`;
+                    document.getElementById('nextButton').addEventListener('click', () => {
+                        const previousTestType = quizData[currentQuestionIndex].testType;
+                        currentQuestionIndex++;
+                        if (currentQuestionIndex < quizData.length && quizData[currentQuestionIndex].testType !== previousTestType) {
+                            showTransitionScreen();
+                        } else {
+                            displayQuestion();
+                        }
+                    });
+
+                } else {
+                    feedbackContainer.classList.add('bg-red-100', 'text-red-800');
+                }
+            } else {
+                currentQuestionIndex++;
+                displayQuestion();
+            }
+        }
+
+        function showFinalScreen() {
+             quizContainer.innerHTML = `
+                <div>
+                    <h2 class="text-2xl font-bold mb-4">Assessment Complete</h2>
+                    <p class="text-gray-700 mb-6">You have answered all the questions for both tests. Click the button below to submit your answers for grading and generate your report.</p>
+                </div>
+                <button id="submitGradeButton" class="w-full p-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                    Submit for Grading
+                </button>
+            `;
+            document.getElementById('submitGradeButton').addEventListener('click', gradeAndSubmit);
+        }
+
+        function gradeAndSubmit() {
+            const studentName = studentNameInput.value.trim();
+            if (!studentName) {
+                const header = document.querySelector('header');
+                let errorMsg = document.getElementById('nameError');
+                if (!errorMsg) {
+                    errorMsg = document.createElement('p');
+                    errorMsg.id = 'nameError';
+                    errorMsg.className = 'text-red-600 text-center mt-2 font-semibold';
+                    header.appendChild(errorMsg);
+                }
+                errorMsg.textContent = 'Please enter your name before submitting.';
+                studentNameInput.focus();
+                studentNameInput.classList.add('border-red-500', 'ring-red-500');
+                return;
+            }
+            const nameError = document.getElementById('nameError');
+            if(nameError) nameError.remove();
+            studentNameInput.classList.remove('border-red-500', 'ring-red-500');
+
+            const classHour = classHourInput.value.trim() || "N/A";
+            let score = 0;
+            let report = '';
+
+            quizData.forEach((q, index) => {
+                const userAnswer = userAnswers[index];
+                const isCorrect = userAnswer === q.correctAnswer;
+                if (isCorrect) score++;
+
+                if (q.testType === 2) {
+                    const userOptionIndex = q.options.findIndex(opt => (opt.text || opt) === userAnswer);
+                    const correctOptionIndex = q.options.findIndex(opt => (opt.text || opt) === q.correctAnswer);
+                    const userAnswerLetter = userOptionIndex > -1 ? String.fromCharCode(65 + userOptionIndex) : '';
+                    const correctAnswerLetter = correctOptionIndex > -1 ? String.fromCharCode(65 + correctOptionIndex) : '';
+                    const formattedUserAnswer = userAnswer ? `${userAnswerLetter}. ${userAnswer}` : 'Not answered';
+                    const formattedCorrectAnswer = `${correctAnswerLetter}. ${q.correctAnswer}`;
+
+                    report += `
+                        <div class="mb-6 p-4 rounded-lg ${isCorrect ? 'bg-green-50' : 'bg-red-50'} border ${isCorrect ? 'border-green-200' : 'border-red-200'}">
+                            <p class="font-semibold text-gray-800">Question ${index + 1}: ${q.question}</p>
+                            <p class="mt-2 text-sm">Your answer: <span class="${isCorrect ? 'text-green-700 font-bold' : 'text-red-700 font-bold'}">${formattedUserAnswer}</span></p>
+                            <p class="mt-1 text-sm">Correct answer: <span class="text-green-700 font-bold">${formattedCorrectAnswer}</span></p>
+                            <div class="mt-2 pt-2 border-t border-gray-200">
+                                <p class="text-sm text-gray-600"><span class="font-semibold">Feedback:</span> ${q.feedback}</p>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            const totalScore = ((score / quizData.length) * 100).toFixed(0);
+
+            quizContainer.innerHTML = `
+                <div>
+                    <h2 class="text-2xl font-bold mb-2">Grading Report for ${studentName}</h2>
+                    <p class="text-lg font-medium mb-4">Final Score: ${score} out of ${quizData.length} (${totalScore}%)</p>
+                    <h3 class="text-xl font-semibold mb-3">Test 2 Feedback:</h3>
+                    <div id="report-container" class="overflow-y-auto" style="max-height: 300px; padding-right: 1rem;">${report}</div>
+                </div>
+                 <div class="mt-6 flex flex-col items-center gap-4">
+                    <p class="text-sm text-center text-gray-600">Your report file has been downloaded.</p>
+                </div>
+            `;
+            
+            generateFile(studentName, classHour, totalScore);
+        }
+
+        function generateFile(studentName, classHour, score) {
+            const passage1Text = document.getElementById('passage1-text').textContent;
+            const passage2Text = document.getElementById('passage2-text').textContent;
+            let fileContent = `Reading Comprehension Assessment Report\n=========================================\n\nStudent: ${studentName}\nClass Hour: ${classHour}\nFinal Score: ${score}%\n\n--- Reading Passages ---\n\nPassage 1: "The Cardboard Rocket"\n${passage1Text}\n\nPassage 2: "The Stage Door"\n${passage2Text}\n\n--- Student Selections ---\n\n`;
+            quizData.forEach((q, index) => {
+                const userAnswer = userAnswers[index];
+                const correctAnsw = q.correctAnswer;
+                const userOptionIndex = q.options.findIndex(opt => (opt.text || opt) === userAnswer);
+                const correctOptionIndex = q.options.findIndex(opt => (opt.text || opt) === correctAnsw);
+                const userAnswerLetter = userOptionIndex > -1 ? `${String.fromCharCode(65 + userOptionIndex)}. ` : '';
+                const correctAnswerLetter = correctOptionIndex > -1 ? `${String.fromCharCode(65 + correctOptionIndex)}. ` : '';
+                fileContent += `Question ${index + 1}: ${q.question}\n   Selected Answer: ${userAnswerLetter}${userAnswers[index] || 'Not answered'}\n   Correct Answer: ${correctAnswerLetter}${q.correctAnswer}\n\n`;
+            });
+            const blob = new Blob([fileContent], { type: 'text/plain' });
+            const anchor = document.createElement('a');
+            anchor.download = `${studentName.replace(/\s/g, '_')}_CFA_Report.txt`;
+            anchor.href = window.URL.createObjectURL(blob);
+            anchor.click();
+            window.URL.revokeObjectURL(anchor.href);
+        }
+        
+        displayQuestion();
+    </script>
+</body>
+</html>
+
