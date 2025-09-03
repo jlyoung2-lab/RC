@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reading Comprehension Adventure</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow: hidden; /* Hide scrollbars from the body */
+        }
+        .story-content {
+            height: calc(100vh - 220px); /* Adjust height based on header/footer */
+        }
+        .question-container {
+            min-height: 400px;
+        }
+        /* Background Animation Styles */
+        #animation-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            background-color: #f0f4f8;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+        #animation-bg.visible {
+            opacity: 1;
+        }
+
+        .firefly {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: #a7f3d0;
+            border-radius: 50%;
+            box-shadow: 0 0 12px #a7f3d0, 0 0 20px #34d399;
+            animation: move 20s linear infinite;
+        }
+
+        .map-line {
+            position: absolute;
+            font-size: 50px;
+            color: rgba(0, 78, 113, 0.1);
+            animation: drift 40s linear infinite;
+            font-family: 'Times New Roman', serif;
+        }
+
+        @keyframes move {
+            0% { transform: translate(var(--x-start), var(--y-start)); opacity: 0; }
+            25% { opacity: 1; }
+            75% { opacity: 1; }
+            100% { transform: translate(var(--x-end), var(--y-end)); opacity: 0; }
+        }
+        
+        @keyframes drift {
+            0% { transform: translate(var(--x-start), var(--y-start)) rotate(0deg); opacity: 0; }
+            25% { opacity: 1; }
+            75% { opacity: 1; }
+            100% { transform: translate(var(--x-end), var(--y-end)) rotate(360deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <div id="animation-bg"></div>
+    <div class="container mx-auto p-4 md:p-8 relative z-10">
+        <header class="bg-white/80 backdrop-blur-sm shadow-md rounded-lg p-6 mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-4 text-center">Reading Comprehension Adventure</h1>
+            <div class="flex flex-col md:flex-row gap-4">
+                <div class="flex-1">
+                    <label for="studentName" class="block text-sm font-medium text-gray-700">Student Name</label>
+                    <input type="text" id="studentName" name="studentName" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="e.g., Alex Rider">
+                </div>
+                <div class="flex-1">
+                    <label for="classHour" class="block text-sm font-medium text-gray-700">Class Hour</label>
+                    <input type="text" id="classHour" name="classHour" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="e.g., 5th Hour">
+                </div>
+            </div>
+        </header>
+
+        <main class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Story Column -->
+            <div class="bg-white/80 backdrop-blur-sm shadow-md rounded-lg p-6">
+                <h2 class="text-2xl font-semibold mb-4 border-b pb-2">Reading Passages</h2>
+                <div id="storyContainer" class="prose max-w-none overflow-y-auto story-content pr-4">
+                    <div id="passage1">
+                        <h3 class="font-bold text-lg">Passage 1: "The Midnight Gardener"</h3>
+                        <p id="passage1-text">Elara lived in Sector 7, a city of polished chrome and sterile air, where every plant was synthetic and every park was a hologram. Real nature was a relic, something seen only in historical archives. Her grandmother, however, remembered a different time. "The earth had a smell," she'd whisper, her eyes distant, "a rich, dark scent of life." Those stories planted a seed of rebellion in Elara's heart. One night, she discovered a forgotten maintenance shaft behind her housing unit. It led to a small, enclosed rooftop, overlooked by all and forgotten by the city's planners. It was here she began her secret. Using soil scavenged from nutrient reclamation bins and seeds smuggled from an off-world trader, Elara started a garden. Her first success was a single, stubborn tomato plant. She watered it with her daily ration, protecting it from the acidic rain under a makeshift canopy. The first time she saw a flash of red among the green leaves, her heart soared. It was a color that didn't glow or blink; it was real. Soon, other plants followed: fragrant basil, sprawling zucchini, and a defiant sunflower that tracked the artificial daylight across the sky. The rooftop became her sanctuary, a pocket of wild, chaotic life in a world of rigid order. She wasn't just growing plants; she was cultivating a memory, a connection to a past she'd never known. The greatest risk wasn't being caught by the Compliance Patrols, but the fear that her secret world could be taken away. Yet, the joy of feeling real soil under her fingernails and tasting a sun-warmed tomato was a truth more powerful than any regulation.</p>
+                    </div>
+                    <hr class="my-6">
+                    <div id="passage2" class="hidden">
+                         <h3 class="font-bold text-lg">Passage 2: "The Mapmaker's Apprentice"</h3>
+                        <p id="passage2-text">Finn’s apprenticeship to Master Corvus, the town's elderly cartographer, was a study in patience. His days were filled with the scent of aging parchment and India ink. He learned to grind pigments for color, to cut quills to a razor-fine point, and to draw a perfectly straight line without a ruler. "A map is not a picture," Corvus would say, his voice thin as a spider's thread. "It is a promise. A promise that if you walk this way, you will find this river. It must be true." Finn respected the craft, but he yearned for the adventure the maps depicted. His world was one of precision and repetition, not exploration. One rainy afternoon, Corvus entrusted Finn with a special task: to organize the "Unfinished" collection in the attic. There, covered in a dusty cloth, Finn found a strange map. It was a large, blank sheet of vellum, except for a single, ornate compass rose in the corner. As he unrolled it, a drop of rainwater from a leak in the roof fell onto the parchment. To his astonishment, the water didn't stain it. Instead, faint blue lines began to spiderweb out from where the drop had landed, sketching the course of the town's river with perfect accuracy. Intrigued, Finn took the map outside after the storm. As he walked towards the Whispering Woods, a forest no one in town had ever fully charted, new details bloomed onto the map's surface in soft green ink: ancient trees, a hidden spring, a winding deer path. The map was alive. It wasn't a record of where people had been, but a guide to where he was going. He realized then that Corvus had taught him more than just how to draw. He had taught him the language of the world, a language of observation and truth. The map was his tool, but his own two feet were the quill that would finally draw the unknown places.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Column -->
+            <div id="quizContainer" class="bg-white/80 backdrop-blur-sm shadow-md rounded-lg p-6 flex flex-col justify-between question-container">
+                 <!-- Questions will be injected here -->
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const studentNameInput = document.getElementById('studentName');
+        const classHourInput = document.getElementById('classHour');
+        const quizContainer = document.getElementById('quizContainer');
+        const animationBg = document.getElementById('animation-bg');
+
+        const quizData = [
+            // Story 1 Questions
+            {
+                testType: 1,
+                passage: 1,
+                question: "What is the central theme of 'The Midnight Gardener'?",
+                options: [
+                    { text: "The dangers of breaking city regulations.", feedback: "While Elara is breaking rules, the story focuses more on *why* she does it and what she gains from it, not just the danger." },
+                    { text: "The importance of remembering and preserving nature in a sterile world.", feedback: "Correct! Elara's garden is a direct act of remembering and preserving the natural world her grandmother described, contrasting with her artificial city." },
+                    { text: "The challenges of growing food in a difficult environment.", feedback: "This is a part of the story, but it's a detail that supports a larger idea. What is the bigger reason she faces these challenges?" },
+                    { text: "The friendship between a girl and her grandmother.", feedback: "Her grandmother's stories are the inspiration, but the core of the story is about Elara's actions and her secret garden." }
+                ],
+                correctAnswer: "The importance of remembering and preserving nature in a sterile world."
+            },
+            {
+                testType: 1,
+                passage: 1,
+                question: "Why is the first tomato so significant to Elara?",
+                options: [
+                    { text: "It was the most difficult plant to grow.", feedback: "The passage doesn't say it was the most difficult, but focuses on what it represented." },
+                    { text: "It proved that she could be a successful gardener.", feedback: "It was more than just a success; it was about the quality of the tomato itself. Think about the description of its color." },
+                    { text: "It was a real, natural object in a world of artificiality.", feedback: "Exactly! The passage says, 'It was a color that didn't glow or blink; it was real.' This highlights the contrast with her synthetic environment." },
+                    { text: "She planned to sell it to an off-world trader.", feedback: "The story suggests her motivation is personal and rebellious, not commercial. The garden is her 'sanctuary.'" }
+                ],
+                correctAnswer: "It was a real, natural object in a world of artificiality."
+            },
+            {
+                testType: 1,
+                passage: 1,
+                question: "What does the phrase 'planted a seed of rebellion' mean in the passage?",
+                options: [
+                    { text: "Elara's grandmother gave her actual seeds to plant.", feedback: "This is a literal interpretation. The phrase is a metaphor. What idea did her grandmother's stories give her?" },
+                    { text: "Elara's grandmother's stories inspired her to defy the city's rules.", feedback: "Correct! The 'seed' was the idea or inspiration that grew into her rebellious act of starting the garden." },
+                    { text: "Elara decided to start a protest against the city's leaders.", feedback: "Her rebellion is quiet and personal (the garden), not a public protest." },
+                    { text: "Elara learned how to find seeds that the city had banned.", feedback: "This refers to a later action. The 'seed of rebellion' is the initial inspiration she got from the stories." }
+                ],
+                correctAnswer: "Elara's grandmother's stories inspired her to defy the city's rules."
+            },
+            {
+                testType: 1,
+                passage: 1,
+                question: "Which of the following best describes Elara's primary motivation for creating the garden?",
+                options: [
+                    { text: "To connect with a forgotten, natural past.", feedback: "Perfect! She is 'cultivating a memory' and connecting to the world her grandmother talked about." },
+                    { text: "To have a secret place to hide from Compliance Patrols.", feedback: "The garden is a secret, but its purpose isn't just to be a hiding place. It has a deeper meaning for her." },
+                    { text: "To prove she is more clever than the city planners.", feedback: "While finding the spot shows cleverness, her motivation is more emotional and personal than competitive." },
+                    { text: "To grow her own food because she dislikes her rations.", feedback: "While she eats the tomato, the joy described comes from its 'realness,' not from it being a replacement for her regular food." }
+                ],
+                correctAnswer: "To connect with a forgotten, natural past."
+            },
+            {
+                testType: 1,
+                passage: 1,
+                question: "What is the greatest risk Elara perceives?",
+                options: [
+                    { text: "Being punished by the Compliance Patrols.", feedback: "The passage explicitly says the greatest risk was *not* being caught. Read the sentence carefully again." },
+                    { text: "Her grandmother revealing her secret.", feedback: "There's no suggestion her grandmother would betray her trust; in fact, she inspired the act." },
+                    { text: "Losing the connection to nature she has built.", feedback: "Correct. The passage says the greatest risk was 'the fear that her secret world could be taken away,' which represents her connection to nature and the past." },
+                    { text: "Her plants dying from the acidic rain.", feedback: "This is a risk to the garden, but the passage identifies a greater emotional risk that Elara feels." }
+                ],
+                correctAnswer: "Losing the connection to nature she has built."
+            },
+
+            // Story 2 Questions
+            {
+                testType: 2,
+                passage: 2,
+                question: "What is the main idea of 'The Mapmaker's Apprentice'?",
+                options: [
+                    "A boy discovers a magical map that does all the work for him.",
+                    "An old mapmaker teaches his apprentice that traditional skills are obsolete.",
+                    "An apprentice learns that true exploration combines traditional knowledge with personal discovery.",
+                    "A boy dislikes his apprenticeship and decides to become an adventurer instead."
+                ],
+                correctAnswer: "An apprentice learns that true exploration combines traditional knowledge with personal discovery.",
+                feedback: "Correct. Finn realizes that the skills Corvus taught him (the 'language of the world') are essential for using the magical map. His own exploration ('his own two feet') is what brings the map to life. It's the combination of the two that matters."
+            },
+            {
+                testType: 2,
+                passage: 2,
+                question: "What does Master Corvus mean when he says a map is 'a promise'?",
+                options: [
+                    "He means that a map is a valuable item that can be sold for a high price.",
+                    "He is promising Finn that he will one day become a great mapmaker.",
+                    "He means that a map must be a trustworthy and accurate representation of the real world.",
+                    "He is referring to a secret promise he made to protect the magical map."
+                ],
+                correctAnswer: "He means that a map must be a trustworthy and accurate representation of the real world.",
+                feedback: "Correct. He follows the statement by saying, 'A promise that if you walk this way, you will find this river. It must be true.' This emphasizes that a map's primary function is its reliability and truthfulness."
+            },
+            {
+                testType: 2,
+                passage: 2,
+                question: "How does the magical map work?",
+                options: [
+                    "It shows the future of the places it depicts.",
+                    "It fills itself in as the map-holder explores new areas.",
+                    "It can only be activated by a special kind of magical ink.",
+                    "It shows whatever the person holding it wishes to see."
+                ],
+                correctAnswer: "It fills itself in as the map-holder explores new areas.",
+                feedback: "Correct. The text states that as Finn 'walked towards the Whispering Woods, new details bloomed onto the map's surface.' This shows it charts the land in real-time as he explores."
+            },
+            {
+                testType: 2,
+                passage: 2,
+                question: "What is the significance of the final sentence: 'The map was his tool, but his own two feet were the quill that would finally draw the unknown places'?",
+                options: [
+                    "It means Finn has to physically draw on the map as he walks.",
+                    "It shows that Finn has decided to abandon the map and rely only on himself.",
+                    "It is a metaphor meaning that the map is useless without active, personal exploration.",
+                    "It means Finn needs to find a special quill to complete the map."
+                ],
+                correctAnswer: "It is a metaphor meaning that the map is useless without active, personal exploration.",
+                feedback: "Correct. This metaphor beautifully summarizes the story's theme. The map (tool) is powerful, but it's his own actions—walking and exploring (the quill)—that create the map and give it meaning."
+            },
+            {
+                testType: 2,
+                passage: 'Both',
+                question: "Which statement best compares the protagonists of both stories?",
+                options: [
+                    "Both Elara and Finn are unhappy with their lives and seek to escape.",
+                    "Both protagonists use a secret, special object to defy the rules of their society.",
+                    "Both stories feature a young person who finds a deeper connection to the world by blending an elder's wisdom with their own actions.",
+                    "Both Elara and Finn are primarily motivated by a desire for adventure."
+                ],
+                correctAnswer: "Both stories feature a young person who finds a deeper connection to the world by blending an elder's wisdom with their own actions.",
+                feedback: "Correct. Elara is inspired by her grandmother's stories (wisdom) and takes action by planting a garden. Finn uses the skills taught by Corvus (wisdom) to embark on his own exploration. Both find fulfillment through this blend."
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let userAnswers = {};
+        
+        // --- Background Animation Logic ---
+        function createFireflies() {
+            animationBg.innerHTML = '';
+            for (let i = 0; i < 20; i++) {
+                const firefly = document.createElement('div');
+                firefly.className = 'firefly';
+                firefly.style.setProperty('--x-start', `${Math.random() * 100}vw`);
+                firefly.style.setProperty('--y-start', `${Math.random() * 100}vh`);
+                firefly.style.setProperty('--x-end', `${Math.random() * 100}vw`);
+                firefly.style.setProperty('--y-end', `${Math.random() * 100}vh`);
+                firefly.style.animationDuration = `${15 + Math.random() * 15}s`;
+                firefly.style.animationDelay = `${Math.random() * 10}s`;
+                animationBg.appendChild(firefly);
+            }
+        }
+
+        function createMapLines() {
+            animationBg.innerHTML = '';
+            const symbols = [' compass', '♆', '✒', '◈', '〜'];
+            for (let i = 0; i < 15; i++) {
+                const line = document.createElement('div');
+                line.className = 'map-line';
+                line.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+                line.style.setProperty('--x-start', `${-10 + Math.random() * 120}vw`);
+                line.style.setProperty('--y-start', `${-10 + Math.random() * 120}vh`);
+                line.style.setProperty('--x-end', `${-10 + Math.random() * 120}vw`);
+                line.style.setProperty('--y-end', `${-10 + Math.random() * 120}vh`);
+                line.style.animationDuration = `${30 + Math.random() * 30}s`;
+                line.style.animationDelay = `${Math.random() * 20}s`;
+                animationBg.appendChild(line);
+            }
+        }
+        
+        function updateBackground(passage) {
+            animationBg.classList.remove('visible');
+            setTimeout(() => {
+                if (passage === 1) {
+                    createFireflies();
+                } else if (passage === 2) {
+                    createMapLines();
+                } else {
+                    animationBg.innerHTML = ''; // Clear for combined view
+                }
+                animationBg.classList.add('visible');
+            }, 500);
+        }
+        // --- End Animation Logic ---
+
+        function updateVisiblePassage(passage) {
+            const passage1Div = document.getElementById('passage1');
+            const passage2Div = document.getElementById('passage2');
+            const hrSeparator = document.querySelector('#passage1 + hr');
+
+            passage1Div.classList.add('hidden');
+            passage2Div.classList.add('hidden');
+            hrSeparator.classList.add('hidden');
+
+            if (passage === 1) {
+                passage1Div.classList.remove('hidden');
+                updateBackground(1);
+            } else if (passage === 2) {
+                passage2Div.classList.remove('hidden');
+                updateBackground(2);
+            } else if (passage === 'Both') {
+                passage1Div.classList.remove('hidden');
+                passage2Div.classList.remove('hidden');
+                hrSeparator.classList.remove('hidden');
+                updateBackground(1); // Default to first story's background
+            }
+        }
+
+        function showTransitionScreen() {
+            quizContainer.innerHTML = `
+                <div class="text-center">
+                    <h2 class="text-2xl font-bold mb-4">Practice Complete</h2>
+                    <p class="text-gray-700 mb-6">You have finished the practice section. The next section will be for your final score and will not provide immediate feedback. When you are ready, please proceed.</p>
+                </div>
+                <button id="startTest2Button" class="w-full p-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Start Final Assessment
+                </button>
+            `;
+            document.getElementById('startTest2Button').addEventListener('click', displayQuestion);
+        }
+
+        function displayQuestion() {
+            if (currentQuestionIndex >= quizData.length) {
+                showFinalScreen();
+                return;
+            }
+
+            const questionData = quizData[currentQuestionIndex];
+            updateVisiblePassage(questionData.passage);
+            
+            let testTitle = questionData.testType === 1 ? 'Part 1: Practice with Feedback' : 'Part 2: Final Assessment';
+            
+            quizContainer.innerHTML = `
+                <div>
+                    <h2 class="text-xl font-semibold mb-2">${testTitle}</h2>
+                    <p class="text-md text-gray-700 mb-4">${questionData.question}</p>
+                    <div id="optionsContainer" class="space-y-3">
+                        ${questionData.options.map((option, index) => `
+                            <button data-index="${index}" class="w-full text-left p-3 bg-gray-200 rounded-lg hover:bg-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-colors duration-200">
+                                <span class="font-bold mr-2">${String.fromCharCode(65 + index)}.</span> ${option.text || option}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <div id="feedbackContainer" class="p-4 rounded-lg hidden"></div>
+                    <div class="text-right mt-4">
+                        <span class="text-sm text-gray-500">Question ${currentQuestionIndex + 1} of ${quizData.length}</span>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('optionsContainer').addEventListener('click', (event) => {
+                const button = event.target.closest('button');
+                if (button) {
+                    handleAnswer(parseInt(button.dataset.index));
+                }
+            });
+        }
+        
+        function handleAnswer(selectedIndex) {
+            const questionData = quizData[currentQuestionIndex];
+            const selectedOption = questionData.options[selectedIndex];
+            const selectedAnswerText = selectedOption.text || selectedOption;
+            userAnswers[currentQuestionIndex] = selectedAnswerText;
+
+            if (questionData.testType === 1) {
+                const isCorrect = selectedAnswerText === questionData.correctAnswer;
+                const feedbackContainer = document.getElementById('feedbackContainer');
+                
+                feedbackContainer.textContent = selectedOption.feedback;
+                feedbackContainer.classList.remove('hidden', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800');
+
+                if (isCorrect) {
+                    feedbackContainer.classList.add('bg-green-100', 'text-green-800');
+                    document.querySelectorAll('#optionsContainer button').forEach(btn => btn.disabled = true);
+                    feedbackContainer.innerHTML += `<button id="nextButton" class="block w-full mt-4 p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Next Question</button>`;
+                    document.getElementById('nextButton').addEventListener('click', () => {
+                        const previousTestType = quizData[currentQuestionIndex].testType;
+                        currentQuestionIndex++;
+                        if (currentQuestionIndex < quizData.length && quizData[currentQuestionIndex].testType !== previousTestType) {
+                            showTransitionScreen();
+                        } else {
+                            displayQuestion();
+                        }
+                    });
+
+                } else {
+                    feedbackContainer.classList.add('bg-red-100', 'text-red-800');
+                }
+            } else {
+                currentQuestionIndex++;
+                displayQuestion();
+            }
+        }
+
+        function showFinalScreen() {
+             quizContainer.innerHTML = `
+                <div>
+                    <h2 class="text-2xl font-bold mb-4">Assessment Complete</h2>
+                    <p class="text-gray-700 mb-6">You have answered all the questions. Click the button below to submit your answers and generate your report.</p>
+                </div>
+                <button id="submitGradeButton" class="w-full p-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                    Submit & See Report
+                </button>
+            `;
+            document.getElementById('submitGradeButton').addEventListener('click', gradeAndSubmit);
+        }
+
+        function gradeAndSubmit() {
+            const studentName = studentNameInput.value.trim();
+            if (!studentName) {
+                const header = document.querySelector('header');
+                let errorMsg = document.getElementById('nameError');
+                if (!errorMsg) {
+                    errorMsg = document.createElement('p');
+                    errorMsg.id = 'nameError';
+                    errorMsg.className = 'text-red-600 text-center mt-2 font-semibold';
+                    header.appendChild(errorMsg);
+                }
+                errorMsg.textContent = 'Please enter your name before submitting.';
+                studentNameInput.focus();
+                studentNameInput.classList.add('border-red-500', 'ring-red-500');
+                return;
+            }
+            const nameError = document.getElementById('nameError');
+            if(nameError) nameError.remove();
+            studentNameInput.classList.remove('border-red-500', 'ring-red-500');
+
+            const classHour = classHourInput.value.trim() || "N/A";
+            let score = 0;
+            let report = '';
+
+            quizData.forEach((q, index) => {
+                const userAnswer = userAnswers[index];
+                const isCorrect = userAnswer === q.correctAnswer;
+                if (isCorrect) score++;
+
+                if (q.testType === 2) {
+                    const userOptionIndex = q.options.findIndex(opt => (opt.text || opt) === userAnswer);
+                    const correctOptionIndex = q.options.findIndex(opt => (opt.text || opt) === q.correctAnswer);
+                    const userAnswerLetter = userOptionIndex > -1 ? String.fromCharCode(65 + userOptionIndex) : '';
+                    const correctAnswerLetter = correctOptionIndex > -1 ? String.fromCharCode(65 + correctOptionIndex) : '';
+                    const formattedUserAnswer = userAnswer ? `${userAnswerLetter}. ${userAnswer}` : 'Not answered';
+                    const formattedCorrectAnswer = `${correctAnswerLetter}. ${q.correctAnswer}`;
+
+                    report += `
+                        <div class="mb-6 p-4 rounded-lg ${isCorrect ? 'bg-green-50' : 'bg-red-50'} border ${isCorrect ? 'border-green-200' : 'border-red-200'}">
+                            <p class="font-semibold text-gray-800">Question ${index + 1}: ${q.question}</p>
+                            <p class="mt-2 text-sm">Your answer: <span class="${isCorrect ? 'text-green-700 font-bold' : 'text-red-700 font-bold'}">${formattedUserAnswer}</span></p>
+                            <p class="mt-1 text-sm">Correct answer: <span class="text-green-700 font-bold">${formattedCorrectAnswer}</span></p>
+                            <div class="mt-2 pt-2 border-t border-gray-200">
+                                <p class="text-sm text-gray-600"><span class="font-semibold">Feedback:</span> ${q.feedback}</p>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            const totalScore = ((score / quizData.length) * 100).toFixed(0);
+
+            quizContainer.innerHTML = `
+                <div>
+                    <h2 class="text-2xl font-bold mb-2">Grading Report for ${studentName}</h2>
+                    <p class="text-lg font-medium mb-4">Final Score: ${score} out of ${quizData.length} (${totalScore}%)</p>
+                    <h3 class="text-xl font-semibold mb-3">Assessment Feedback:</h3>
+                    <div id="report-container" class="overflow-y-auto" style="max-height: 300px; padding-right: 1rem;">${report}</div>
+                </div>
+                 <div class="mt-6 flex flex-col items-center gap-4">
+                    <p class="text-sm text-center text-gray-600">A text file of your report has been downloaded.</p>
+                </div>
+            `;
+            
+            generateFile(studentName, classHour, totalScore);
+        }
+
+        function generateFile(studentName, classHour, score) {
+            const passage1Text = document.getElementById('passage1-text').textContent;
+            const passage2Text = document.getElementById('passage2-text').textContent;
+            let fileContent = `Reading Comprehension Assessment Report\n=========================================\n\nStudent: ${studentName}\nClass Hour: ${classHour}\nFinal Score: ${score}%\n\n--- Reading Passages ---\n\nPassage 1: "The Midnight Gardener"\n${passage1Text}\n\nPassage 2: "The Mapmaker's Apprentice"\n${passage2Text}\n\n--- Student Selections ---\n\n`;
+            quizData.forEach((q, index) => {
+                const userAnswer = userAnswers[index];
+                const correctAnsw = q.correctAnswer;
+                const userOptionIndex = q.options.findIndex(opt => (opt.text || opt) === userAnswer);
+                const correctOptionIndex = q.options.findIndex(opt => (opt.text || opt) === correctAnsw);
+                const userAnswerLetter = userOptionIndex > -1 ? `${String.fromCharCode(65 + userOptionIndex)}. ` : '';
+                const correctAnswerLetter = correctOptionIndex > -1 ? `${String.fromCharCode(65 + correctOptionIndex)}. ` : '';
+                fileContent += `Question ${index + 1}: ${q.question}\n   Selected Answer: ${userAnswerLetter}${userAnswers[index] || 'Not answered'}\n   Correct Answer: ${correctAnswerLetter}${q.correctAnswer}\n\n`;
+            });
+            const blob = new Blob([fileContent], { type: 'text/plain' });
+            const anchor = document.createElement('a');
+            anchor.download = `${studentName.replace(/\s/g, '_')}_Reading_Report.txt`;
+            anchor.href = window.URL.createObjectURL(blob);
+            anchor.click();
+            window.URL.revokeObjectURL(anchor.href);
+        }
+        
+        displayQuestion();
+    </script>
+</body>
+</html>

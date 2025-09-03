@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Reading Comprehension</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            position: relative;
+            background-color: #0f172a; /* Dark Slate Blue */
+            color: #e2e8f0; /* Light gray-blue text */
+            overflow-x: hidden;
+        }
+
+        /* Animated Background Styles */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+            z-index: -2;
+            overflow: hidden;
+        }
+
+        .glowing-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: float 20s ease-in-out infinite;
+            box-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #0ff; /* White and cyan glow */
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); opacity: 0.7; }
+            50% { transform: translateY(-25px); opacity: 1; }
+            100% { transform: translateY(0px); opacity: 0.7; }
+        }
+        
+        /* Glassmorphism effect for containers */
+        .glass-card {
+            background-color: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Custom scrollbar for story content */
+        .story-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        .story-content::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        .story-content::-webkit-scrollbar-thumb {
+            background: rgba(0, 255, 255, 0.5);
+            border-radius: 10px;
+        }
+        .story-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 255, 255, 0.8);
+        }
+
+        .story-content {
+            height: calc(100vh - 200px); /* Adjust height based on header/footer */
+        }
+        .question-container {
+            min-height: 400px;
+        }
+    </style>
+</head>
+<body class="text-slate-200">
+
+    <div class="glowing-particles"></div>
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="glass-card shadow-lg rounded-lg p-6 mb-8">
+            <h1 class="text-3xl font-bold text-white mb-4 text-center">Reading Comprehension Adventure</h1>
+            <div class="flex flex-col md:flex-row gap-4">
+                <div class="flex-1">
+                    <label for="studentName" class="block text-sm font-medium text-slate-300">Student Name</label>
+                    <input type="text" id="studentName" name="studentName" class="mt-1 block w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm text-white" placeholder="e.g., Alex Rider">
+                </div>
+                <div class="flex-1">
+                    <label for="classHour" class="block text-sm font-medium text-slate-300">Class Hour</label>
+                    <input type="text" id="classHour" name="classHour" class="mt-1 block w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm text-white" placeholder="e.g., 4th Period">
+                </div>
+            </div>
+        </header>
+
+        <main class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Story Column -->
+            <div class="glass-card shadow-lg rounded-lg p-6">
+                <h2 class="text-2xl font-semibold mb-4 border-b border-slate-600 pb-2 text-white">Reading Passages</h2>
+                <div id="storyContainer" class="prose prose-invert max-w-none overflow-y-auto story-content pr-4">
+                    <div id="passage1">
+                        <h3 class="font-bold text-lg text-cyan-300">Passage 1: "The Silent Orchestra"</h3>
+                        <p id="passage1-text">Elara lived for the low, mournful song of the foghorn and the steady, sweeping beam of the lighthouse her grandfather, Silas, kept. The old tower stood on a jagged tooth of rock, lashed by salty winds. Most people thought Silas was just a quiet old man, but Elara knew his secret. One day, while chasing a stray cat, she stumbled upon a loose stone in the lighthouse's foundation. Behind it was a hidden door. Inside was not a dusty storage room, but a workshop aglow with soft light. Intricate, beautiful creations covered every surface: a crab with gears for legs, a jellyfish whose bell was made of stained glass, and a tiny whale that swam through the air, suspended by fine wires. They were an orchestra of silent, mechanical sea creatures. Silas found her there, his weathered face not angry, but soft with a smile. "This is my music," he whispered, tapping a key on a strange, organ-like console. Instantly, the creatures whirred to life. The crab scuttled, the jellyfish pulsed with light, and the whale dipped and soared. He explained that he'd spent his life building them, finding a way to capture the soul of the sea not in sound, but in motion and light. It was a secret symphony for an audience of one, until now.</p>
+                    </div>
+                    <hr class="my-6 border-slate-600">
+                    <div id="passage2" class="hidden">
+                         <h3 class="font-bold text-lg text-cyan-300">Passage 2: "Anya's Rooftop"</h3>
+                        <p id="passage2-text">In the sterile, gleaming chrome city of Aethel, green things were a luxury. Real, living plants were confined to the sterile Bio-Domes, accessible only to the wealthy. Anya, however, had a secret. On the flat, forgotten roof of her apartment block, she tended to a small, illegal garden. It wasn't just any garden. She cultivated rare, bio-luminescent flora scavenged from the city's waste reclamation chutes. Her prize was a patch of 'Noctiluca'—fungi that glowed a soft blue—and a vine of 'Sonus Blooms,' flowers whose petals would shimmer with vibrant colors in response to sound. At night, Anya would play her flute, and the rooftop would come alive with a silent, dancing light show. It was her sanctuary. One evening, a sleek corporate drone from the OmniCorp conglomerate hovered over her rooftop. It scanned her garden, its red optical sensor lingering on the Sonus Blooms. The next day, she received an official notice: her "unregulated biological specimens" were to be confiscated for corporate research. Anya knew what that meant. OmniCorp would patent her plants and sell them as luxury decor. Her sanctuary would become a product. Refusing to let them win, Anya carefully gathered seeds from every plant. That night, under the cloak of darkness, she traveled the city's service corridors and maintenance passages, planting the seeds in countless forgotten nooks and hidden crevices across Aethel. Her rooftop garden might be gone, but she had just planted a thousand secret sanctuaries for others to find.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Column -->
+            <div id="quizContainer" class="glass-card shadow-lg rounded-lg p-6 flex flex-col justify-between question-container">
+                 <!-- Questions will be injected here -->
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Background particle generation
+        document.addEventListener('DOMContentLoaded', () => {
+            const particleContainer = document.querySelector('.glowing-particles');
+            const numParticles = 50;
+            for (let i = 0; i < numParticles; i++) {
+                let particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                const size = Math.random() * 3 + 1;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                particle.style.top = `${Math.random() * 100}%`;
+                particle.style.left = `${Math.random() * 100}%`;
+                
+                const animationDuration = Math.random() * 15 + 10; // 10s to 25s
+                const animationDelay = Math.random() * 10; // 0s to 10s
+                particle.style.animation = `float ${animationDuration}s ease-in-out ${animationDelay}s infinite`;
+
+                particleContainer.appendChild(particle);
+            }
+        });
+
+
+        const studentNameInput = document.getElementById('studentName');
+        const classHourInput = document.getElementById('classHour');
+        const quizContainer = document.getElementById('quizContainer');
+
+        const quizData = [
+            // Story 1 Questions (Test 1 with feedback)
+            {
+                testType: 1,
+                passage: 1,
+                question: "What is the central theme of 'The Silent Orchestra'?",
+                options: [
+                    { text: "The dangers of living by the sea.", feedback: "While the setting is by the sea, the story isn't about danger. Think about what Silas creates and why." },
+                    { text: "Creativity and passion can be expressed in unique and private ways.", feedback: "Correct! Silas expresses his passion not through music everyone can hear, but through a unique, silent 'symphony' of his own creation." },
+                    { text: "The importance of keeping family secrets.", feedback: "While it was a secret, the main point isn't about secrecy itself, but what the secret was—a form of personal expression." },
+                    { text: "The process of building mechanical toys.", feedback: "This is what Silas does, but it's not the main theme. The theme is *why* he does it—to express the 'soul of the sea'." }
+                ],
+                correctAnswer: "Creativity and passion can be expressed in unique and private ways."
+            },
+            {
+                testType: 1,
+                passage: 1,
+                question: "What does Elara discover behind the hidden door?",
+                options: [
+                    { text: "A room full of old lighthouse equipment.", feedback: "The story says it was 'not a dusty storage room,' suggesting it was something more surprising." },
+                    { text: "A secret passage to the top of the lighthouse.", feedback: "Elara finds a workshop, not a passage. The focus is on the objects inside the room." },
+                    { text: "A workshop filled with mechanical sea creatures.", feedback: "Correct! The text says she found a 'workshop aglow with soft light' filled with 'intricate, beautiful creations' resembling sea creatures." },
+                    { text: "A treasure chest filled with gold.", feedback: "The treasure she found was creative, not monetary. The room was filled with mechanical animals." }
+                ],
+                correctAnswer: "A workshop filled with mechanical sea creatures."
+            },
+            {
+                testType: 1,
+                passage: 1,
+                question: "How does Silas make his creations come to life?",
+                options: [
+                    { text: "By winding them up with a key.", feedback: "The mechanism is more complex than a simple wind-up key. Think about the description of the console." },
+                    { text: "By using a remote control.", feedback: "The story describes something more integrated and artistic than a remote control." },
+                    { text: "By clapping his hands.", feedback: "This is incorrect. He interacts with a specific object to activate the creatures." },
+                    { text: "By tapping a key on an organ-like console.", feedback: "Exactly! The story says he 'tapped a key on a strange, organ-like console' which caused the creatures to whir to life." }
+                ],
+                correctAnswer: "By tapping a key on an organ-like console."
+            },
+            {
+                testType: 1,
+                passage: 1,
+                question: "The word 'mournful' as used to describe the foghorn most nearly means:",
+                options: [
+                    { text: "Joyful and loud", feedback: "Mournful has a negative connotation, the opposite of joyful. Think of the sound a foghorn makes." },
+                    { text: "Sad and sorrowful", feedback: "That's right. A 'mournful' sound is one that evokes sadness, which fits the lonely, deep sound of a foghorn." },
+                    { text: "Annoying and repetitive", feedback: "While some might find it annoying, 'mournful' describes the emotional quality of the sound, not how irritating it is." },
+                    { text: "Faint and distant", feedback: "A foghorn is designed to be loud and carry over a distance, so faint is unlikely. 'Mournful' describes the tone." }
+                ],
+                correctAnswer: "Sad and sorrowful"
+            },
+             {
+                testType: 1,
+                passage: 1,
+                question: "Why wasn't Silas angry when Elara found his workshop?",
+                options: [
+                    { text: "Because he was planning to show it to her anyway.", feedback: "The story doesn't state this. His reaction seems spontaneous." },
+                    { text: "He was happy to finally share his secret passion with someone.", feedback: "Correct! His reaction—a 'soft smile' and his explanation—suggests he was relieved and happy to share his life's work with his granddaughter." },
+                    { text: "Because he knew she wouldn't tell anyone.", feedback: "This might be true, but his primary emotion seems to be happiness at sharing, not just relief at the secret being safe." },
+                    { text: "The story does not provide enough information to know.", feedback: "We can infer his feelings from his actions. He smiles and immediately explains his work, suggesting he's not angry." }
+                ],
+                correctAnswer: "He was happy to finally share his secret passion with someone."
+            },
+            // Story 2 Questions (Test 2 without immediate feedback)
+            {
+                testType: 2,
+                passage: 2,
+                question: "Which sentence best summarizes the main conflict of 'Anya's Rooftop'?",
+                options: [
+                    "Anya struggles to find rare plants in the city's waste chutes.",
+                    "Anya's personal sanctuary is threatened by a corporation that wants to commercialize it.",
+                    "Anya is afraid of being caught for her illegal gardening activities.",
+                    "Anya has a competition with other gardeners to grow the most beautiful plants."
+                ],
+                correctAnswer: "Anya's personal sanctuary is threatened by a corporation that wants to commercialize it.",
+                feedback: "The correct answer is B. This choice accurately identifies the central conflict between Anya's personal, natural sanctuary and OmniCorp's desire to confiscate and profit from it."
+            },
+            {
+                testType: 2,
+                passage: 2,
+                question: "What is special about the 'Sonus Blooms'?",
+                options: [
+                    "They produce a beautiful scent.",
+                    "They can survive without water.",
+                    "They change color in response to sound.",
+                    "They grow very quickly in the dark."
+                ],
+                correctAnswer: "They change color in response to sound.",
+                feedback: "The correct answer is C. The passage states the flowers' petals 'would shimmer with vibrant colors in response to sound,' which is why Anya's flute playing created a light show."
+            },
+            {
+                testType: 2,
+                passage: 2,
+                question: "Why does Anya plant the seeds all over the city?",
+                options: [
+                    "She wants to sell them to make money before OmniCorp can.",
+                    "She is angry and wants to destroy the city with overgrown plants.",
+                    "She wants to preserve the plants and share the magic of her sanctuary with others.",
+                    "She is trying to hide the seeds so she can get them back later."
+                ],
+                correctAnswer: "She wants to preserve the plants and share the magic of her sanctuary with others.",
+                feedback: "The correct answer is C. By spreading the seeds, she ensures that even if her own garden is taken, the plants will survive and others might find the same joy and sanctuary she did, undermining OmniCorp's control."
+            },
+            {
+                testType: 2,
+                passage: 2,
+                question: "The setting of Aethel is best described as:",
+                options: [
+                    "A rural, natural landscape.",
+                    "An ancient, historic city.",
+                    "A dirty, industrial dystopia.",
+                    "A futuristic, sterile, and highly controlled city."
+                ],
+                correctAnswer: "A futuristic, sterile, and highly controlled city.",
+                feedback: "The correct answer is D. Descriptions like 'gleaming chrome,' 'sterile,' and the fact that plants are confined to 'Bio-Domes' point to a clean, futuristic, but unnatural and controlled environment."
+            },
+            {
+                testType: 2,
+                passage: 2,
+                question: "What does OmniCorp's drone hovering over the garden most likely symbolize?",
+                options: [
+                    "The helpfulness of technology.",
+                    "The beauty of nature.",
+                    "The invasion of privacy and corporate greed.",
+                    "The threat of bad weather."
+                ],
+                correctAnswer: "The invasion of privacy and corporate greed.",
+                feedback: "The correct answer is C. The drone is an agent of the corporation, and its 'scan' represents an unwelcome intrusion that leads directly to the threat of confiscation, symbolizing corporate overreach and the loss of privacy."
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let userAnswers = {};
+        
+        function updateVisiblePassage(passage) {
+            const passage1Div = document.getElementById('passage1');
+            const passage2Div = document.getElementById('passage2');
+            const hrSeparator = document.querySelector('#passage1 + hr');
+
+            passage1Div.classList.add('hidden');
+            passage2Div.classList.add('hidden');
+            hrSeparator.classList.add('hidden');
+
+            if (passage === 1) {
+                passage1Div.classList.remove('hidden');
+            } else if (passage === 2) {
+                passage2Div.classList.remove('hidden');
+            } else if (passage === 'Both') {
+                passage1Div.classList.remove('hidden');
+                passage2Div.classList.remove('hidden');
+                hrSeparator.classList.remove('hidden');
+            }
+        }
+
+        function showTransitionScreen() {
+            quizContainer.innerHTML = `
+                <div class="text-center">
+                    <h2 class="text-2xl font-bold mb-4 text-white">Test 1 Complete</h2>
+                    <p class="text-slate-300 mb-6">You have completed the first part of the assessment. When you are ready, please proceed to Test 2. This section will not provide immediate feedback on your answers.</p>
+                </div>
+                <button id="startTest2Button" class="w-full p-3 bg-cyan-600 text-white font-bold rounded-lg hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 ring-offset-slate-800 transition-colors">
+                    Start Test 2
+                </button>
+            `;
+            document.getElementById('startTest2Button').addEventListener('click', displayQuestion);
+        }
+
+        function displayQuestion() {
+            if (currentQuestionIndex >= quizData.length) {
+                showFinalScreen();
+                return;
+            }
+
+            const questionData = quizData[currentQuestionIndex];
+            updateVisiblePassage(questionData.passage);
+            
+            let testTitle = questionData.testType === 1 ? 'Test 1: Practice with Feedback' : 'Test 2: Final Assessment';
+            
+            quizContainer.innerHTML = `
+                <div>
+                    <h2 class="text-xl font-semibold mb-2 text-white">${testTitle}</h2>
+                    <p class="text-md text-slate-300 mb-4">${questionData.question}</p>
+                    <div id="optionsContainer" class="space-y-3">
+                        ${questionData.options.map((option, index) => `
+                            <button data-index="${index}" class="w-full text-left p-3 bg-slate-700/50 rounded-lg hover:bg-cyan-500/20 focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-colors duration-200">
+                                <span class="font-bold mr-2 text-cyan-300">${String.fromCharCode(65 + index)}.</span> ${option.text || option}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <div id="feedbackContainer" class="p-4 rounded-lg hidden"></div>
+                    <div class="text-right mt-4">
+                        <span class="text-sm text-slate-400">Question ${currentQuestionIndex + 1} of ${quizData.length}</span>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('optionsContainer').addEventListener('click', (event) => {
+                const button = event.target.closest('button');
+                if (button) {
+                    handleAnswer(parseInt(button.dataset.index));
+                }
+            });
+        }
+        
+        function handleAnswer(selectedIndex) {
+            const questionData = quizData[currentQuestionIndex];
+            const selectedOption = questionData.options[selectedIndex];
+            const selectedAnswerText = selectedOption.text || selectedOption;
+            userAnswers[currentQuestionIndex] = selectedAnswerText;
+
+            if (questionData.testType === 1) {
+                const isCorrect = selectedAnswerText === questionData.correctAnswer;
+                const feedbackContainer = document.getElementById('feedbackContainer');
+                
+                feedbackContainer.textContent = selectedOption.feedback;
+                feedbackContainer.classList.remove('hidden', 'bg-green-900/50', 'text-green-300', 'bg-red-900/50', 'text-red-300');
+                document.querySelectorAll('#optionsContainer button').forEach(btn => btn.disabled = true);
+
+
+                if (isCorrect) {
+                    feedbackContainer.classList.add('bg-green-900/50', 'text-green-300');
+                    document.querySelector(`#optionsContainer button[data-index='${selectedIndex}']`).classList.add('!bg-green-500/40', 'ring-2', 'ring-green-400');
+                    feedbackContainer.innerHTML += `<button id="nextButton" class="block w-full mt-4 p-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700">Next Question</button>`;
+                    document.getElementById('nextButton').addEventListener('click', () => {
+                        const previousTestType = quizData[currentQuestionIndex].testType;
+                        currentQuestionIndex++;
+                        if (currentQuestionIndex < quizData.length && quizData[currentQuestionIndex].testType !== previousTestType) {
+                            showTransitionScreen();
+                        } else {
+                            displayQuestion();
+                        }
+                    });
+
+                } else {
+                    feedbackContainer.classList.add('bg-red-900/50', 'text-red-300');
+                    document.querySelector(`#optionsContainer button[data-index='${selectedIndex}']`).classList.add('!bg-red-500/40', 'ring-2', 'ring-red-400');
+
+                }
+            } else {
+                // For test type 2, just mark the selection and move on
+                document.querySelectorAll('#optionsContainer button').forEach(btn => btn.classList.remove('!bg-cyan-500/40'));
+                 document.querySelector(`#optionsContainer button[data-index='${selectedIndex}']`).classList.add('!bg-cyan-500/40');
+                
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    displayQuestion();
+                }, 300);
+            }
+        }
+
+        function showFinalScreen() {
+             quizContainer.innerHTML = `
+                <div>
+                    <h2 class="text-2xl font-bold mb-4 text-white">Assessment Complete</h2>
+                    <p class="text-slate-300 mb-6">You have answered all the questions for both tests. Click the button below to submit your answers for grading and generate your report.</p>
+                </div>
+                <button id="submitGradeButton" class="w-full p-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ring-offset-slate-800">
+                    Submit for Grading
+                </button>
+            `;
+            document.getElementById('submitGradeButton').addEventListener('click', gradeAndSubmit);
+        }
+
+        function gradeAndSubmit() {
+            const studentName = studentNameInput.value.trim();
+            if (!studentName) {
+                const header = document.querySelector('header');
+                let errorMsg = document.getElementById('nameError');
+                if (!errorMsg) {
+                    errorMsg = document.createElement('p');
+                    errorMsg.id = 'nameError';
+                    errorMsg.className = 'text-red-400 text-center mt-2 font-semibold';
+                    header.appendChild(errorMsg);
+                }
+                errorMsg.textContent = 'Please enter your name before submitting.';
+                studentNameInput.focus();
+                studentNameInput.classList.add('border-red-500', 'ring-red-500');
+                return;
+            }
+            const nameError = document.getElementById('nameError');
+            if(nameError) nameError.remove();
+            studentNameInput.classList.remove('border-red-500', 'ring-red-500');
+
+            const classHour = classHourInput.value.trim() || "N/A";
+            let score = 0;
+            let report = '';
+
+            quizData.forEach((q, index) => {
+                const userAnswer = userAnswers[index];
+                const isCorrect = userAnswer === q.correctAnswer;
+                if (isCorrect) score++;
+
+                if (q.testType === 2) {
+                    const userOptionIndex = q.options.findIndex(opt => (opt.text || opt) === userAnswer);
+                    const correctOptionIndex = q.options.findIndex(opt => (opt.text || opt) === q.correctAnswer);
+                    const userAnswerLetter = userOptionIndex > -1 ? String.fromCharCode(65 + userOptionIndex) : '';
+                    const correctAnswerLetter = correctOptionIndex > -1 ? String.fromCharCode(65 + correctOptionIndex) : '';
+                    const formattedUserAnswer = userAnswer ? `${userAnswerLetter}. ${userAnswer}` : 'Not answered';
+                    const formattedCorrectAnswer = `${correctAnswerLetter}. ${q.correctAnswer}`;
+
+                    report += `
+                        <div class="mb-6 p-4 rounded-lg ${isCorrect ? 'bg-green-900/30' : 'bg-red-900/30'} border ${isCorrect ? 'border-green-500/30' : 'border-red-500/30'}">
+                            <p class="font-semibold text-slate-100">Question ${index + 1}: ${q.question}</p>
+                            <p class="mt-2 text-sm">Your answer: <span class="${isCorrect ? 'text-green-400 font-bold' : 'text-red-400 font-bold'}">${formattedUserAnswer}</span></p>
+                            <p class="mt-1 text-sm">Correct answer: <span class="text-green-400 font-bold">${formattedCorrectAnswer}</span></p>
+                            <div class="mt-2 pt-2 border-t border-slate-600">
+                                <p class="text-sm text-slate-300"><span class="font-semibold">Feedback:</span> ${q.feedback}</p>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            const totalScore = ((score / quizData.length) * 100).toFixed(0);
+
+            quizContainer.innerHTML = `
+                <div>
+                    <h2 class="text-2xl font-bold mb-2 text-white">Grading Report for ${studentName}</h2>
+                    <p class="text-lg font-medium mb-4 text-cyan-300">Final Score: ${score} out of ${quizData.length} (${totalScore}%)</p>
+                    <h3 class="text-xl font-semibold mb-3 text-white">Test 2 Feedback:</h3>
+                    <div id="report-container" class="overflow-y-auto story-content" style="max-height: 300px; padding-right: 1rem;">${report}</div>
+                </div>
+                 <div class="mt-6 flex flex-col items-center gap-4">
+                    <p class="text-sm text-center text-slate-400">Your report file has been downloaded.</p>
+                </div>
+            `;
+            
+            generateFile(studentName, classHour, totalScore);
+        }
+
+        function generateFile(studentName, classHour, score) {
+            const passage1Text = document.getElementById('passage1-text').textContent;
+            const passage2Text = document.getElementById('passage2-text').textContent;
+            let fileContent = `Reading Comprehension Assessment Report\n=========================================\n\nStudent: ${studentName}\nClass Hour: ${classHour}\nFinal Score: ${score}%\n\n--- Reading Passages ---\n\nPassage 1: "The Silent Orchestra"\n${passage1Text}\n\nPassage 2: "Anya's Rooftop"\n${passage2Text}\n\n--- Student Selections ---\n\n`;
+            quizData.forEach((q, index) => {
+                const userAnswer = userAnswers[index];
+                const correctAnsw = q.correctAnswer;
+                const userOptionIndex = q.options.findIndex(opt => (opt.text || opt) === userAnswer);
+                const correctOptionIndex = q.options.findIndex(opt => (opt.text || opt) === correctAnsw);
+                const userAnswerLetter = userOptionIndex > -1 ? `${String.fromCharCode(65 + userOptionIndex)}. ` : '';
+                const correctAnswerLetter = correctOptionIndex > -1 ? `${String.fromCharCode(65 + correctOptionIndex)}. ` : '';
+                fileContent += `Question ${index + 1}: ${q.question}\n   Selected Answer: ${userAnswerLetter}${userAnswers[index] || 'Not answered'}\n   Correct Answer: ${correctAnswerLetter}${q.correctAnswer}\n\n`;
+            });
+            const blob = new Blob([fileContent], { type: 'text/plain' });
+            const anchor = document.createElement('a');
+            anchor.download = `${studentName.replace(/\s/g, '_')}_Reading_Report.txt`;
+            anchor.href = window.URL.createObjectURL(blob);
+            anchor.click();
+            window.URL.revokeObjectURL(anchor.href);
+        }
+        
+        displayQuestion();
+    </script>
+</body>
+</html>
